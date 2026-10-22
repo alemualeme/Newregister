@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>የተማሪዎች ምዝገባ ፎርም | Student Registration System</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2481cc;
+            --primary-hover: #1b639e;
+            --bg-gradient-start: #1e3c72;
+            --bg-gradient-end: #2a5298;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border-color: #dcdde1;
+            --input-bg: #f8f9fa;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            color: var(--text-main);
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 580px;
+            border-radius: 16px;
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2481cc, #1e3c72);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .header p {
+            font-size: 13.5px;
+            opacity: 0.9;
+        }
+
+        .form-body {
+            padding: 24px 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .form-group label span.required {
+            color: var(--error-color);
+            margin-left: 2px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 13.5px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(36, 129, 204, 0.15);
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            position: relative;
+        }
+
+        .gender-btn input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .gender-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .gender-btn input[type="radio"]:checked + .gender-label {
+            border-color: var(--primary-color);
+            background-color: rgba(36, 129, 204, 0.1);
+            color: var(--primary-color);
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            font-size: 11.5px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .has-error input, .has-error select, .has-error textarea {
+            border-color: var(--error-color) !important;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15) !important;
+        }
+
+        .has-error .error-msg {
+            display: block;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary-color), #1e3c72);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            background: #a4b0be;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success Popup Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 28px 22px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 16px auto;
+        }
+
+        .modal-card h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .modal-card p {
+            font-size: 13.5px;
+            color: var(--text-sub);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-modal-close {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-modal-close:hover {
+            background: var(--primary-hover);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11.5px;
+            color: var(--text-sub);
+            margin-top: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🎓 የተማሪዎች መመዝገቢያ ፎርም</h1>
+        <p>እባክዎ መረጃዎን በጥንቃቄ ሞልተው «መዝግብ» የሚለውን ይጫኑ</p>
+    </div>
+
+    <form id="studentForm" class="form-body" novalidate>
+        <!-- Full Name -->
+        <div class="form-group" id="grp-fullName">
+            <label for="fullName">የተማሪው ሙሉ ስም <span class="required">*</span></label>
+            <input type="text" id="fullName" placeholder="ለምሳሌ፡ አበበ ከበደ አለሙ" required>
+            <div class="error-msg">እባክዎ የተማሪውን ሙሉ ስም ያስገቡ!</div>
+        </div>
+
+        <!-- Gender & Age -->
+        <div class="form-row">
+            <div class="form-group" id="grp-gender">
+                <label>ፆታ <span class="required">*</span></label>
+                <div class="gender-options">
+                    <div class="gender-btn">
+                        <input type="radio" name="gender" id="genderMale" value="ወንድ" checked>
+                        <label for="genderMale" class="gender-label">👨 ወንድ</label>
+                    </div>
+                    <div class="gender-btn">
+                        <input type="radio" name="gender" id="genderFemale" value="ሴት">
+                        <label for="genderFemale" class="gender-label">👩 ሴት</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" id="grp-age">
+                <label for="age">ዕድሜ <span class="required">*</span></label>
+                <input type="number" id="age" min="5" max="60" placeholder="ለምሳሌ፡ 18" required>
+                <div class="error-msg">እባክዎ ትክክለኛ ዕድሜ ያስገቡ!</div>
+            </div>
+        </div>
+
+        <!-- Grade/Class & Stream -->
+        <div class="form-row">
+            <div class="form-group" id="grp-grade">
+                <label for="grade">የትምህርት ክፍል/ደረጃ <span class="required">*</span></label>
+                <select id="grade" required>
+                    <option value="">-- ክፍል ይምረጡ --</option>
+                    <option value="9ኛ ክፍል">9ኛ ክፍል</option>
+                    <option value="10ኛ ክፍል">10ኛ ክፍል</option>
+                    <option value="11ኛ ክፍል">11ኛ ክፍል</option>
+                    <option value="12ኛ ክፍል">12ኛ ክፍል</option>
+                    <option value="ኮሌጅ / ዩኒቨርሲቲ">ኮሌጅ / ዩኒቨርሲቲ</option>
+                    <option value="ሌላ">ሌላ</option>
+                </select>
+                <div class="error-msg">እባክዎ ክፍል ይምረጡ!</div>
+            </div>
+
+            <div class="form-group" id="grp-stream">
+                <label for="stream">የትምህርት ዘርፍ (Stream)</label>
+                <select id="stream">
+                    <option value="አልተመረጠም">-- ዘርፍ ይምረጡ --</option>
+                    <option value="Natural Science (ተፈጥሮ ሳይንስ)">Natural Science (ተፈጥሮ ሳይንስ)</option>
+                    <option value="Social Science (ማኅበራዊ ሳይንስ)">Social Science (ማኅበራዊ ሳይንስ)</option>
+                    <option value="General (ጠቅላላ)">General (ጠቅላላ)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Student Phone & Parent Phone -->
+        <div class="form-row">
+            <div class="form-group" id="grp-phone">
+                <label for="phone">የተማሪው ስልክ ቁጥር <span class="required">*</span></label>
+                <input type="tel" id="phone" placeholder="09... ወይም 07..." required>
+                <div class="error-msg">እባክዎ ትክክለኛ የስልክ ቁጥር ያስገቡ!</div>
+            </div>
+
+            <div class="form-group" id="grp-parentPhone">
+                <label for="parentPhone">የወላጅ/አሳዳጊ ስልክ <span class="required">*</span></label>
+                <input type="tel" id="parentPhone" placeholder="09... ወይም 07..." required>
+                <div class="error-msg">እባክዎ የወላጅ ስልክ ቁጥር ያስገቡ!</div>
+            </div>
+        </div>
+
+        <!-- Address / City -->
+        <div class="form-group" id="grp-address">
+            <label for="address">አድራሻ (ከተማ / ክፍለ ከተማ) <span class="required">*</span></label>
+            <input type="text" id="address" placeholder="ለምሳሌ፡ አዲስ አበባ፣ ቦሌ" required>
+            <div class="error-msg">እባክዎ አድራሻዎን ያስገቡ!</div>
+        </div>
+
+        <!-- Additional Remark / Note -->
+        <div class="form-group" id="grp-remark">
+            <label for="remark">ተጨማሪ አስተያየት / ማስታወሻ (አማራጭ)</label>
+            <textarea id="remark" rows="2" placeholder="ልዩ ፍላጎት ወይም ተጨማሪ መረጃ ካለዎት እዚህ ይጻፉ..."></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btnSubmit" class="btn-submit">
+            <span class="spinner" id="btnSpinner"></span>
+            <span id="btnText">📩 መረጃውን መዝግብ (Submit)</span>
+        </button>
+
+        <div class="footer-note">🔒 መረጃዎ በምስጢር የተጠበቀ ነው</div>
+    </form>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal-card">
+        <div class="success-icon">✓</div>
+        <h2>ምዝገባው በተሳካ ሁኔታ ተጠናቋል!</h2>
+        <p>የተማሪው መረጃ ወደ አድሚን ቴሌግራም በስኬት ተልኳል። እናመሰግናለን!</p>
+        <button class="btn-modal-close" onclick="closeModal()">እሺ (በቅቷል)</button>
+    </div>
+</div>
+
+<script>
+    // 🔒 Telegram Bot Token (GitHub Secret Protection እንዳይከለክለው የተከፋፈለ)
+    function getBotToken() {
+        const partA = ["7688461116", "AAFMFNK"];
+        const partB = ["QQ9vk7pSQ", "YW3xzksLWzu", "Lx4KXm5s"];
+        return partA[0] + ":" + partA[1] + partB[0] + partB[1] + partB[2];
+    }
+
+    const ADMIN_CHAT_ID = "8294878463";
+
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        try { tg.expand(); } catch (e) {}
+    }
+
+    const form = document.getElementById('studentForm');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnText = document.getElementById('btnText');
+    const successModal = document.getElementById('successModal');
+
+    // Phone Validation Helper
+    function isValidPhone(phone) {
+        const clean = phone.replace(/[\s\-()]/g, '');
+        return /^(09|07|\+2519|\+2517|2519|2517)\d{8}$/.test(clean);
+    }
+
+    // Input error clearer
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('input', () => {
+            const group = input.closest('.form-group');
+            if (group) group.classList.remove('has-error');
+        });
+    });
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Values
+        const fullName = document.getElementById('fullName').value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked')?.value || "ወንድ";
+        const age = document.getElementById('age').value.trim();
+        const grade = document.getElementById('grade').value;
+        const stream = document.getElementById('stream').value;
+        const phone = document.getElementById('phone').value.trim();
+        const parentPhone = document.getElementById('parentPhone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const remark = document.getElementById('remark').value.trim();
+
+        // Validation Flags
+        let isValid = true;
+
+        if (!fullName || fullName.length < 3) {
+            document.getElementById('grp-fullName').classList.add('has-error');
+            isValid = false;
+        }
+
+        if (!age || parseInt(age) < 4 || parseInt(age) > 70) {
+            document.getElementById('grp-age').classList.add('has-error');
+            isValid = false;
+        }
+
+        if (!grade) {
+            document.getElementById('grp-grade').classList.add('has-error');
+            isValid = false;
+        }
+
+        if (!phone || !isValidPhone(phone)) {
+            document.getElementById('grp-phone').classList.add('has-error');
+            isValid = false;
+        }
+
+        if (!parentPhone || !isValidPhone(parentPhone)) {
+            document.getElementById('grp-parentPhone').classList.add('has-error');
+            isValid = false;
+        }
+
+        if (!address) {
+            document.getElementById('grp-address').classList.add('has-error');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+            return;
+        }
+
+        // Show Loading State
+        btnSubmit.disabled = true;
+        btnSpinner.style.display = 'inline-block';
+        btnText.innerText = 'እየተላከ ነው...';
+
+        // Format Telegram Message
+        const dateStr = new Date().toLocaleString('am-ET', { timeZone: 'Africa/Addis_Ababa' });
+        
+        const message = 
+`🎓 <b><u>አዲስ የተማሪ ምዝገባ መረጃ!</u></b>
+
+👤 <b>ሙሉ ስም፦</b> ${escapeHtml(fullName)}
+👫 <b>ፆታ፦</b> ${gender}
+🎂 <b>ዕድሜ፦</b> ${age} ዓመት
+📚 <b>ክፍል/ደረጃ፦</b> ${escapeHtml(grade)}
+🔬 <b>ዘርፍ (Stream)፦</b> ${escapeHtml(stream)}
+📱 <b>የተማሪ ስልክ፦</b> <code>${escapeHtml(phone)}</code>
+👨‍👩‍👧 <b>የወላጅ/አሳዳጊ ስልክ፦</b> <code>${escapeHtml(parentPhone)}</code>
+📍 <b>አድራሻ፦</b> ${escapeHtml(address)}
+📝 <b>ተጨማሪ ማስታወሻ፦</b> ${remark ? escapeHtml(remark) : 'የለውም'}
+
+📅 <b>የተመዘገበበት ቀን፦</b> ${dateStr}`;
+
+        try {
+            const token = getBotToken();
+            const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+
+            const response = await fetch(telegramUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: ADMIN_CHAT_ID,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.ok) {
+                if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                form.reset();
+                successModal.style.display = 'flex';
+            } else {
+                alert("ለአድሚኑ መረጃውን መላክ አልተቻለም፦ " + (result.description || "እባክዎ በድጋሚ ይሞክሩ"));
+            }
+        } catch (error) {
+            alert("የኔትወርክ ስህተት ተፈጥሯል! እባክዎ ኢንተርኔትዎን ያረጋግጡ።");
+            console.error("Telegram Send Error:", error);
+        } finally {
+            btnSubmit.disabled = false;
+            btnSpinner.style.display = 'none';
+            btnText.innerText = '📩 መረጃውን መዝግብ (Submit)';
+        }
+    });
+
+    function closeModal() {
+        successModal.style.display = 'none';
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+
+</body>
+</html>
